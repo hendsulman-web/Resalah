@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هناك رسالة تنتظرِك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* التصميم: بطاقة مركزية على خلفية باستيل متحركة، وبين الواجهة والبطاقة ظرف رسالة يُفتح */
+:root{
+  --pink:#f9d3e4;
+  --pink-deep:#e58ab4;
+  --lilac:#d9c9f5;
+  --violet:#7a5bc2;
+  --ink:#3b2a5a;
+  --gold:#d2a64a;
+  --gold-deep:#a97f22;
+  --paper:#fffdfb;
+  --f-display:'Aref Ruqaa','Amiri','Noto Naskh Arabic',serif;
+  --f-body:'Tajawal','Segoe UI',Tahoma,'Noto Sans Arabic',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--f-body);color:var(--ink);min-height:100vh;
+  background:linear-gradient(160deg,#fde6f1 0%,#efe6fb 55%,#fff5e3 100%);
+  background-attachment:fixed;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+[hidden]{display:none!important}
+button,input,textarea,select{font-family:inherit;font-size:1rem;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* خلفية متحركة */
+#bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.float{position:absolute;bottom:-12%;opacity:.55;animation:rise linear infinite;will-change:transform}
+@keyframes rise{
+  from{transform:translate(0,0) rotate(0)}
+  50%{transform:translate(18px,-60vh) rotate(18deg)}
+  to{transform:translate(-14px,-120vh) rotate(36deg)}
+}
+
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+main{width:100%;max-width:560px;margin:auto 0}
+main.wide{max-width:1000px}
+
+.panel{
+  background:rgba(255,255,255,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1.5px solid rgba(210,166,74,.4);border-radius:28px;
+  box-shadow:0 18px 50px rgba(122,91,194,.16);padding:clamp(22px,5vw,40px);
+}
+.center{text-align:center}
+
+h1{
+  font-family:var(--f-display);font-weight:700;margin:0 0 .35em;line-height:1.35;
+  font-size:clamp(2.2rem,8vw,3.5rem);
+  background:linear-gradient(100deg,var(--violet),var(--pink-deep));-webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;text-wrap:balance;
+}
+.welcome{font-size:1.25rem;font-weight:700;margin:0 0 .4em}
+.sub{margin:0 0 1.6em;color:#6a5a86;line-height:1.9}
+.rule{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--gold);margin:0 0 1.2em;letter-spacing:.4em}
+.rule::before,.rule::after{content:"";height:1.5px;width:48px;background:linear-gradient(90deg,transparent,var(--gold))}
+.rule::after{transform:scaleX(-1)}
+
+label.lbl{display:block;text-align:right;font-weight:700;margin:0 6px 8px}
+.field{
+  width:100%;padding:15px 22px;border-radius:999px;border:2px solid var(--lilac);background:#fff;
+  text-align:center;font-size:1.2rem;transition:border-color .2s,box-shadow .2s;
+}
+.field:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 5px rgba(210,166,74,.2)}
+.field.shake{animation:shk .45s}
+@keyframes shk{20%{transform:translateX(7px)}40%{transform:translateX(-7px)}60%{transform:translateX(5px)}80%{transform:translateX(-5px)}}
+.hint{min-height:1.7em;margin:.6em 0 .2em;color:#b0457a;font-weight:500}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.4em;cursor:pointer;
+  border:0;border-radius:999px;padding:13px 28px;font-weight:700;color:#fff;
+  background:linear-gradient(100deg,var(--violet),var(--pink-deep));
+  box-shadow:0 8px 20px rgba(122,91,194,.3);transition:transform .15s,box-shadow .15s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(122,91,194,.36)}
+.btn:active{transform:translateY(0)}
+.btn.big{font-size:1.2rem;padding:15px 36px;margin-top:.5em}
+.btn.soft{background:#fff;color:var(--violet);border:2px solid var(--lilac);box-shadow:none}
+.btn.soft:hover{border-color:var(--violet);box-shadow:none}
+.btn.gold{background:linear-gradient(100deg,#e0b95e,var(--gold-deep));box-shadow:0 8px 20px rgba(169,127,34,.28)}
+.btn.sm{padding:8px 16px;font-size:.92rem;box-shadow:none}
+.btn.warn{background:#fff;color:#b0457a;border:2px solid #f2b9d2;box-shadow:none}
+.btn.warn.armed{background:#b0457a;color:#fff;border-color:#b0457a}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.foot{margin-top:2.2em;font-size:.9rem;color:#8a7aa6}
+.linkbtn{background:none;border:0;cursor:pointer;color:var(--violet);text-decoration:underline;padding:6px;font-size:.9rem}
+
+/* الظرف */
+.env-wrap{text-align:center;padding:10px 0 0}
+.env{--w:min(300px,76vw);position:relative;width:var(--w);height:calc(var(--w)*.64);margin:80px auto 26px}
+.env .back{position:absolute;inset:0;background:#f2b6d0;border-radius:12px;box-shadow:0 14px 30px rgba(229,138,180,.35)}
+.env .paper{position:absolute;left:8%;right:8%;top:7%;height:82%;background:var(--paper);border-radius:8px;z-index:2;
+  transition:transform 1s cubic-bezier(.3,.8,.3,1);
+  background-image:repeating-linear-gradient(transparent 0 15px,#f0e4f7 15px 16px);background-size:100% 100%;
+  box-shadow:0 -2px 10px rgba(0,0,0,.06)}
+.env .paper::after{content:"💗";position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:1.2rem}
+.env .pocket{position:absolute;inset:0;z-index:3;border-radius:12px;background:#f8cde0;clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%)}
+.env .flap{position:absolute;left:0;right:0;top:0;height:58%;background:#eea9c6;z-index:4;
+  clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0}
+.env .seal{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:5;width:38px;height:38px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f1d58b,var(--gold-deep));color:#fff;display:grid;place-items:center;font-size:1.1rem;
+  box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.env.shake{animation:wob .65s ease-in-out}
+@keyframes wob{15%{transform:rotate(-4deg)}35%{transform:rotate(4deg)}55%{transform:rotate(-3deg)}75%{transform:rotate(2deg)}}
+.env.open .flap{animation:flap .8s forwards}
+@keyframes flap{
+  0%{transform:perspective(700px) rotateX(0);z-index:4}
+  49%{z-index:4}
+  50%{z-index:1}
+  100%{transform:perspective(700px) rotateX(180deg);z-index:1}
+}
+.env.open .seal{opacity:0;transition:opacity .2s}
+.env.rise .paper{transform:translateY(-62%)}
+.env-cap{color:var(--violet);font-weight:700;font-size:1.1rem}
+
+/* الرسالة */
+.letter{
+  position:relative;background:var(--paper);text-align:center;border-radius:20px;padding:clamp(22px,5vw,38px) clamp(18px,5vw,34px);
+  border:2px solid var(--gold);outline:1.5px solid rgba(210,166,74,.5);outline-offset:-9px;
+  box-shadow:0 14px 36px rgba(122,91,194,.18);
+  background-image:radial-gradient(circle at 100% 0,rgba(249,211,228,.55),transparent 40%),radial-gradient(circle at 0 100%,rgba(217,201,245,.55),transparent 42%);
+}
+.letter.pop{animation:pop .8s cubic-bezier(.2,1.2,.3,1)}
+@keyframes pop{from{opacity:0;transform:scale(.7) translateY(30px)}to{opacity:1;transform:none}}
+.letter.swap{animation:swp .5s ease}
+@keyframes swp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.l-orn{color:var(--gold);letter-spacing:.5em;font-size:.9rem}
+.l-name{font-family:var(--f-display);font-weight:700;color:var(--violet);font-size:clamp(2.1rem,8vw,3rem);line-height:1.4;margin:.1em 0 0;word-break:break-word}
+.l-title{font-family:var(--f-display);font-weight:400;color:var(--pink-deep);font-size:1.5rem;margin:.1em 0 .8em}
+.l-body{font-size:1.15rem;line-height:2.05}
+.l-body p{margin:0 0 .7em}
+.l-close{font-weight:700;color:var(--gold-deep);font-size:1.15rem;margin:1em 0 .4em}
+.l-sign{font-family:var(--f-display);font-size:1.45rem;color:var(--violet);margin:.2em 0 0}
+.actions{margin-top:1.6em}
+
+/* مؤثرات الانفجار */
+.burst{position:fixed;z-index:50;pointer-events:none;font-size:1.4rem;animation:bst 1.4s ease-out forwards}
+@keyframes bst{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.3) rotate(var(--r))}}
+
+/* لوحة المعلمة */
+.tp-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.tp-head h2{font-family:var(--f-display);color:var(--violet);margin:0;font-size:2rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:#fff;border:1.5px solid #eadff7;border-radius:22px;padding:20px;min-width:0}
+.box h3{margin:0 0 12px;color:var(--violet);font-size:1.15rem}
+.box + .box{margin-top:0}
+.stack{display:grid;gap:18px;align-content:start;min-width:0}
+.fl{display:block;font-weight:700;margin:10px 0 6px;font-size:.95rem}
+.in{width:100%;padding:11px 16px;border:2px solid var(--lilac);border-radius:16px;background:#fff}
+.in:focus{outline:none;border-color:var(--gold)}
+textarea.in{min-height:140px;resize:vertical;line-height:1.8}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.note{font-size:.88rem;color:#7b6c97;line-height:1.8;margin:8px 0 0}
+.note.warnbox{background:#fff7e0;border:1.5px solid #f0dc9e;border-radius:14px;padding:12px 14px;color:#6f5a1c}
+.list{display:grid;gap:10px;max-height:520px;overflow:auto;padding:2px}
+.srow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;border:1.5px solid #efe6fa;border-radius:16px;padding:10px 14px;background:#fffafd}
+.srow b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.srow small{display:block;color:#7b6c97;margin-top:2px;overflow-wrap:anywhere}
+.badge{font-size:.72rem;background:#fff0c9;color:#7a5d12;border-radius:999px;padding:2px 9px;font-weight:700}
+.srow .btns{margin:0;justify-content:flex-end}
+.empty{color:#8a7aa6;text-align:center;padding:18px}
+
+/* نوافذ */
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(59,42,90,.45);display:grid;place-items:center;padding:16px;overflow:auto}
+.modal{background:#fff;border-radius:26px;padding:26px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal.big{max-width:560px}
+.modal h3{font-family:var(--f-display);color:var(--violet);font-size:1.7rem;margin:0 0 10px}
+
+#toast{position:fixed;z-index:60;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* الطباعة */
+#printArea{display:none}
+@media print{
+  @page{margin:10mm}
+  body{background:#fff!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important}
+  #printArea.one{display:grid!important;place-items:start center}
+  #printArea.one .letter{width:150mm;margin-top:15mm}
+  #printArea.all{display:grid!important;grid-template-columns:1fr 1fr;gap:7mm}
+  #printArea .letter{break-inside:avoid;box-shadow:none;animation:none}
+  #printArea.all .letter{padding:6mm 5mm}
+  #printArea.all .l-body{font-size:.95rem;line-height:1.85}
+  #printArea.all .l-name{font-size:1.9rem}
+}
+
+@media (max-width:760px){.grid2{grid-template-columns:1fr}.srow{grid-template-columns:1fr}.srow .btns{justify-content:flex-start}}
+@media (prefers-reduced-motion:reduce){
+  .float{animation:none;opacity:.3}
+  .letter.pop,.letter.swap,.env.shake{animation:none}
+  .env .paper{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+
+<div id="app">
+<main id="main">
+
+  <!-- واجهة البداية -->
+  <section id="viewStart" class="panel center">
+    <div class="rule" aria-hidden="true">✦ ✦ ✦</div>
+    <h1>هناك رسالة تنتظرِك 💌</h1>
+    <p class="welcome">معكِ رسالة مميزة، كُتبت لكِ وحدكِ</p>
+    <p class="sub">بعض الكلمات تشبه الهدية، وهذه الكلمات كُتبت من أجلكِ</p>
+    <form id="searchForm" autocomplete="off" novalidate>
+      <label class="lbl" for="nameInput">اسمكِ الأول</label>
+      <input id="nameInput" class="field" type="text" placeholder="اكتبي اسمكِ هنا" enterkeyhint="search" autocomplete="off" aria-describedby="hint">
+      <div id="hint" class="hint" aria-live="polite"></div>
+      <button class="btn big" type="submit" id="btnSearch">ابحثي عن رسالتكِ ✨</button>
+    </form>
+    <div class="foot"><button class="linkbtn" id="btnTeacher" type="button">لوحة المعلمة</button></div>
+  </section>
+
+  <!-- الظرف -->
+  <section id="viewEnv" class="panel env-wrap" hidden>
+    <div class="env" id="env" aria-hidden="true">
+      <div class="back"></div>
+      <div class="paper"></div>
+      <div class="pocket"></div>
+      <div class="flap"></div>
+      <div class="seal">♥</div>
+    </div>
+    <div class="env-cap" role="status">جارٍ فتح رسالتكِ…</div>
+  </section>
+
+  <!-- بطاقة الرسالة -->
+  <section id="viewCard" hidden>
+    <div id="cardHost"></div>
+    <div class="row actions">
+      <button class="btn gold" id="btnAnother" type="button">رسالة أخرى 💌</button>
+      <button class="btn soft" id="btnPrint" type="button">اطبعي رسالتي 🖨️</button>
+      <button class="btn soft" id="btnBack" type="button">العودة للبداية</button>
+    </div>
+  </section>
+
+  <!-- لوحة المعلمة -->
+  <section id="viewTeacher" hidden>
+    <div class="panel">
+      <div class="tp-head">
+        <h2>لوحة المعلمة 🌸</h2>
+        <button class="btn soft sm" id="btnExit" type="button">خروج للواجهة</button>
+      </div>
+      <p class="note warnbox" id="storageNote"></p>
+
+      <div class="grid2" style="margin-top:18px">
+        <div class="stack">
+          <div class="box">
+            <h3 id="formTitle">إضافة طالبة</h3>
+            <label class="fl" for="tName">اسم الطالبة</label>
+            <input class="in" id="tName" type="text" autocomplete="off">
+            <label class="fl" for="tTheme">موضوع الرسالة العشوائية</label>
+            <select class="in" id="tTheme"></select>
+            <label class="fl" for="tMsg">رسالتها</label>
+            <textarea class="in" id="tMsg" placeholder="اكتبي رسالة خاصة بها، أو اتركيها فارغة لتظهر لها رسالة من المكتبة"></textarea>
+            <div class="btns">
+              <button class="btn sm" id="btnSave" type="button">حفظ</button>
+              <button class="btn sm gold" id="btnGen" type="button">رسالة عشوائية ✨</button>
+              <button class="btn sm soft" id="btnPrev" type="button">معاينة</button>
+              <button class="btn sm soft" id="btnCancelEdit" type="button" hidden>إلغاء التعديل</button>
+            </div>
+          </div>
+
+          <div class="box">
+            <h3>الإعدادات</h3>
+            <label class="fl" for="sTeacher">اسم المعلمة في التوقيع</label>
+            <input class="in" id="sTeacher" type="text">
+            <label class="fl" for="sPass">رمز دخول جديد (4 خانات فأكثر)</label>
+            <input class="in" id="sPass" type="text" inputmode="numeric" placeholder="اتركيه فارغًا لإبقاء الرمز الحالي" autocomplete="off">
+            <div class="btns"><button class="btn sm" id="btnSettings" type="button">حفظ الإعدادات</button></div>
+            <p class="note">الرمز مجرد حاجز بسيط يمنع الدخول بالخطأ، وليس حماية حقيقية: أي شخص يعرف كيف يفحص الصفحة يستطيع رؤيته.</p>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="box">
+            <h3>الطالبات (<span id="count">0</span>)</h3>
+            <input class="in" id="filter" type="search" placeholder="ابحثي في القائمة" aria-label="ابحثي في القائمة">
+            <div class="list" id="list" style="margin-top:12px"></div>
+          </div>
+
+          <div class="box">
+            <h3>استيراد وتصدير</h3>
+            <label class="fl" for="pasteBox">لصق أسماء دفعة واحدة</label>
+            <textarea class="in" id="pasteBox" style="min-height:90px" placeholder="اسم في كل سطر، أو أسماء تفصل بينها فاصلة.&#10;ولإضافة رسالة: الاسم | الرسالة"></textarea>
+            <div class="btns">
+              <button class="btn sm" id="btnPaste" type="button">إضافة الأسماء</button>
+              <label class="btn sm soft" for="csvFile" style="cursor:pointer">استيراد ملف CSV</label>
+              <input id="csvFile" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
+            </div>
+            <p class="note">في ملف CSV: العمود الأول اسم الطالبة، والثاني رسالتها (اختياري). يُفضّل حفظ الملف بترميز UTF-8.</p>
+            <div class="btns" style="margin-top:16px">
+              <button class="btn sm gold" id="btnFill" type="button">ملء الرسائل الفارغة عشوائيًا</button>
+              <button class="btn sm soft" id="btnCsv" type="button">تصدير CSV</button>
+              <button class="btn sm soft" id="btnPrintAll" type="button">طباعة كل البطاقات</button>
+            </div>
+            <div class="btns">
+              <button class="btn sm soft" id="btnBackup" type="button">نسخة احتياطية</button>
+              <label class="btn sm soft" for="restoreFile" style="cursor:pointer">استعادة نسخة</label>
+              <input id="restoreFile" type="file" accept=".json,application/json" hidden>
+              <button class="btn sm soft" id="btnShare" type="button">تنزيل نسخة للطالبات</button>
+            </div>
+            <p class="note warnbox">«نسخة للطالبات» ملف HTML واحد تظهر فيه الرسائل لمن يفتحه، وتبقى بيانات الطالبات مكتوبة داخله ويمكن قراءتها لمن يفحص الملف. لا ترسليه إلا لمن تثقين به.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="note" style="margin-top:18px">
+        تُحفظ البيانات في متصفح هذا الجهاز فقط (التخزين المحلي). لا تُزامَن مع أجهزة أخرى، وقد تُفقد إذا مُسحت بيانات المتصفح أو فُتحت الصفحة في نافذة خاصة أو من متصفح آخر. احتفظي بنسخة احتياطية بين وقت وآخر.
+      </p>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<!-- نافذة الرمز -->
+<div class="overlay" id="gate" hidden>
+  <form class="modal center" id="gateForm" autocomplete="off">
+    <h3>لوحة المعلمة</h3>
+    <p class="sub" style="margin-bottom:1em">اكتبي رمز الدخول للمتابعة</p>
+    <input class="field" id="gateInput" type="password" inputmode="numeric" aria-label="رمز الدخول" autocomplete="off">
+    <div class="hint" id="gateHint" aria-live="polite"></div>
+    <div class="row"><button class="btn" type="submit">دخول</button><button class="btn soft" type="button" id="gateCancel">إلغاء</button></div>
+  </form>
+</div>
+
+<!-- نافذة المعاينة -->
+<div class="overlay" id="preview" hidden>
+  <div class="modal big" role="dialog" aria-label="معاينة الرسالة">
+    <div id="previewHost"></div>
+    <div class="row" style="margin-top:16px"><button class="btn soft" id="previewClose" type="button">إغلاق المعاينة</button></div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="printArea" aria-hidden="true"></div>
+
+<script id="seed" type="application/json">null</script>
+<script>
+(function(){
+'use strict';
+
+/* نسخة من الصفحة قبل أي تعديل، تُستخدم لتصدير «نسخة للطالبات» */
+var SRC = '<!doctype html>\n' + document.documentElement.outerHTML;
+
+var KEY = 'hunak-risala-v1';
+var $ = function(s){ return document.querySelector(s); };
+var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ========== مكتبة الرسائل ========== */
+var LIB = [
+ {t:'الثقة بالنفس', x:'يا {name}، أريدكِ أن تعرفي أن ثقتكِ بنفسكِ أجمل ما فيكِ حين تظهر. أشكركِ على كل مرة حاولتِ فيها وقلتِ «أستطيع»، فقد رأيتُ ذلك وفرحتُ به. صوتكِ مهم، ورأيكِ له مكان دائم عندي.'},
+ {t:'الثقة بالنفس', x:'{name}، حين أنظر إلى جهدكِ أرى فتاة تعرف أكثر مما تظن. شكرًا لأنكِ تأتين كل يوم بقلبٍ مستعد للتعلم. ثقي بخطواتكِ، فهي تأخذكِ إلى أماكن جميلة.'},
+ {t:'الطموح', x:'{name}، طموحكِ يشبه نجمة تضيء في أول الليل؛ صغيرة اليوم، لكنها تدل على طريق طويل جميل. أشكركِ على حماسكِ وعلى أسئلتكِ التي تفتح أبوابًا جديدة. احلمي بما تشائين، وسأصفق لكِ في كل خطوة.'},
+ {t:'الطموح', x:'إلى {name}: أحلامكِ تستحق أن تُقال بصوت عالٍ. شكرًا لأنكِ تضعين لنفسكِ أهدافًا وتسعين إليها بهدوء وإصرار. أنا فخورة بكِ جدًا، وأرى أمامكِ مستقبلًا جميلًا.'},
+ {t:'الإبداع', x:'{name}، في أفكاركِ لمسة لا تشبه إلا صاحبتها. شكرًا على كل فكرة جديدة قدمتِها وعلى جرأتكِ في أن ترَي الأشياء بطريقتكِ. استمري في الإبداع، فالعالم يحتاج إلى ألوانكِ.'},
+ {t:'الإبداع', x:'كم أحب أن أراكِ يا {name} حين تبتكرين شيئًا جديدًا وعيناكِ تلمعان! أشكركِ على خيالكِ الواسع وعلى لمستكِ الخاصة في كل ما تقدمينه. ابقي كما أنتِ، مبدعة وصادقة.'},
+ {t:'الاجتهاد', x:'{name}، رأيتُ تعبكِ الجميل ولم يغب عني. أشكركِ على كل واجب أنجزتِه بحب، وكل محاولة أعدتِها حتى تتقنيها. الاجتهاد بذرة تُسقى كل يوم، وثمارها قادمة بإذن الله.'},
+ {t:'الاجتهاد', x:'إلى {name} التي تعمل بصمت وتتقدم بثبات: شكرًا لجهدكِ الذي أراه وأقدّره. كل صفحة كتبتِها وكل سؤال حللتِه خطوة في طريقكِ. أنا فخورة بكِ.'},
+ {t:'الصبر', x:'{name}، الصبر قوة هادئة، وأنتِ تملكين منها الكثير. شكرًا لأنكِ تعودين وتحاولين مهما تأخرت النتيجة. ما تزرعينه اليوم سيزهر في وقته، وأنا معكِ حتى ذلك الحين.'},
+ {t:'الصبر', x:'يا {name}، أعرف أن بعض الأيام تحتاج إلى نَفَس طويل، وأعرف أنكِ تستطيعين. أشكركِ على هدوئكِ وإصراركِ. خذي وقتكِ، فالنهايات الجميلة لا تأتي مستعجلة.'},
+ {t:'تجاوز الصعوبات', x:'{name}، ليست كل الطرق سهلة، لكنكِ تثبتين أن الصعوبة تصغر أمام من لا تتوقف. شكرًا لأنكِ لا تستسلمين. كل عقبة تجاوزتِها زادتكِ قوة، وأنا أرى ذلك بوضوح.'},
+ {t:'تجاوز الصعوبات', x:'إلى {name}: حين يصعب الأمر، تذكري أنكِ عبرتِ قبله أمورًا كثيرة. أشكركِ على شجاعتكِ في المحاولة من جديد. لستِ وحدكِ أبدًا، وأنا بجانبكِ.'},
+ {t:'التميز', x:'{name}، تميزكِ لا يحتاج إلى ضجيج؛ يظهر في اهتمامكِ وفي لمستكِ الأنيقة في كل عمل. شكرًا على إتقانكِ وحرصكِ. هذا النور الذي فيكِ يستحق أن يُرى.'},
+ {t:'التميز', x:'يا {name}، في كل ما تقدمينه أثرٌ جميل يشبهكِ. أشكركِ على جهدكِ المتقن وعلى روحكِ الطيبة في الصف. سرّني كثيرًا أن أكون معلمتكِ.'},
+ {t:'اللطف', x:'{name}، لطفكِ مع من حولكِ يجعل الصف مكانًا أدفأ. شكرًا لكلمتكِ الطيبة وابتسامتكِ التي تصل قبل أن تتكلمي. اللطف قوة حقيقية، وأنتِ تملكينها.'},
+ {t:'اللطف', x:'إلى {name} صاحبة القلب الكبير: أشكركِ على طيبتكِ وعلى مساعدتكِ دون أن يُطلب منكِ. أمثالكِ يجعلن العالم أجمل. أنا فخورة بكِ.'},
+ {t:'الشجاعة', x:'{name}، الشجاعة أن تحاولي حتى وأنتِ خائفة، وقد فعلتِ ذلك كثيرًا. شكرًا لأنكِ شاركتِ وسألتِ وجرّبتِ. خطواتكِ الجريئة تفتح لكِ أبوابًا جديدة.'},
+ {t:'الشجاعة', x:'يا {name}، ما أجمل أن أراكِ ترفعين يدكِ وتقولين رأيكِ! شكرًا لصدقكِ وجرأتكِ الجميلة. استمري، فصوتكِ يستحق أن يُسمع.'},
+ {t:'اكتشاف المواهب', x:'{name}، بداخلكِ مواهب كثيرة، بعضها ظهر وبعضها ينتظر دوره. شكرًا لأنكِ تجرّبين وتكتشفين. استمري في البحث عمّا تحبين، فما تحبينه يقودكِ إلى ما تتقنين.'},
+ {t:'اكتشاف المواهب', x:'إلى {name}: كل يوم أكتشف فيكِ شيئًا جميلًا جديدًا. أشكركِ على فضولكِ وعلى حبكِ للتجربة. موهبتكِ تنمو كل يوم، وأنا أنتظر ما ستفاجئيننا به.'},
+ {t:'الثقة بالنفس', x:'يا {name}، أجمل ما فيكِ أنكِ تقولين رأيكِ بهدوء وصدق. شكرًا لحضوركِ الطيب ولجهدكِ الذي يظهر في أدق التفاصيل. أنا فخورة بكِ، ومؤمنة بأن لكِ مكانًا كبيرًا ينتظركِ.'},
+ {t:'الطموح', x:'{name}، كل خطوة تخطينها نحو حلمكِ تقرّبكِ منه، حتى الصغيرة منها. شكرًا لأنكِ تسعين وتتعلمين وتطلبين الأفضل لنفسكِ. سأظل أشجعكِ، فمستقبلكِ يستحق كل هذا الحماس.'},
+ {t:'الإبداع', x:'إلى {name}: تعجبني طريقتكِ في تحويل الفكرة العادية إلى شيء جميل. أشكركِ على لمساتكِ التي تُدخل البهجة إلى الصف. لا تتوقفي عن التجربة، فكل محاولة تصنع لكِ أسلوبًا خاصًا.'},
+ {t:'الاجتهاد', x:'{name}، ما تبذلينه من جهد يصل إليّ كل يوم، وأقدّره من قلبي. شكرًا لأنكِ تكملين ما بدأتِ وتهتمين بالتفاصيل. أنا فخورة بكِ، والنتائج الجميلة تأتي لمن تثابر.'},
+ {t:'الصبر', x:'يا {name}، أحيانًا يبدو الطريق طويلًا، لكنكِ تمشين فيه بخطوات ثابتة. أشكركِ على صبركِ وعلى عودتكِ بعد كل تعثر. كل يوم جديد فرصة، وأنا أؤمن بكِ.'},
+ {t:'اللطف', x:'{name}، وجودكِ يضيف إلى الصف دفئًا لا يُنسى. شكرًا لروحكِ الطيبة ولكلماتكِ التي تفرح من حولكِ. أنتِ نعمة جميلة، وأنا سعيدة أنكِ بين طالباتي.'}
+];
+var THEMES = LIB.map(function(m){return m.t;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+
+/* ========== أدوات ========== */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function uid(){return Math.random().toString(36).slice(2,10);}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function fill(t,n){return t.replace(/\{name\}/g,n);}
+function firstName(n){return String(n).trim().split(/\s+/)[0]||'';}
+function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
+function digits(s){return String(s).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-0x660;}).replace(/[۰-۹]/g,function(d){return d.charCodeAt(0)-0x6F0;}).trim();}
+function norm(s){
+  return String(s).normalize('NFKC')
+    .replace(/[ً-ٰٟـ]/g,'')
+    .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي')
+    .toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
+}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ========== البيانات والحفظ المحلي ========== */
+var storageOK = true, studentCopy = false;
+try{ localStorage.setItem(KEY+'-t','1'); localStorage.removeItem(KEY+'-t'); }catch(e){ storageOK=false; }
+
+var NAMES = [
+  'اريام سعود محمد العوفي','العنود مسيعيد زبار المخلفي','ترف عبدالرحمن المخلفي','تغريد فهيد عايض الحربي',
+  'جوري نايف مرشد الصاعدي','دارين عبدالله محمد الحربي','ديم عادل حميد الحربي','ديمة بندر بن جهز العمري',
+  'رزين فهد عيسى المطيري','رغد صلاح عبدالحميد الحربي','رفيف محمد اهليل الحربي','ريفان شاكر نذير أحمد زير ملوك',
+  'ريُمان شاكر نذير أحمد زير ملوك','ريناس نور حسين سعيد الله اسماعيل','شذى احمد محمد الحربي','عفاف عبدالله سعيد الله إسماعيل',
+  'فجر صالح محمد الحربي','لينا فهد الحربي','مدى فالح بن محمد الحيسوني','مريم بندر عمر الحربي',
+  'منتهى عبد المحسن بن سنيد الحربي','نسمة حامد الطاهر ابراهيم','هنادي محمد زين حمد محي الدين'
+];
+/* لكل طالبة رسالة مختلفة من المكتبة، ويمكن للمعلمة تعديلها من اللوحة */
+var DEFAULT = {
+  settings:{teacher:'هند الحيسوني', pass:'1234'},
+  students:NAMES.map(function(n,i){ return {id:uid(), name:n, msg:fill(LIB[i%LIB.length].x, firstName(n))}; })
+};
+function load(){
+  var seed=null;
+  try{ seed=JSON.parse($('#seed').textContent); }catch(e){}
+  if(seed && seed.studentCopy){ studentCopy=true; seed.settings=seed.settings||{teacher:''}; return seed; }
+  if(storageOK){
+    try{ var raw=localStorage.getItem(KEY); if(raw){ var d=JSON.parse(raw); if(d && Array.isArray(d.students)){ d.settings=Object.assign({teacher:'هند الحيسوني',pass:'1234'},d.settings||{}); return d; } } }catch(e){}
+  }
+  return clone(DEFAULT);
+}
+var S = load();
+function save(){
+  if(studentCopy) return;
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ storageOK=false; toast('تعذّر الحفظ في هذا المتصفح. ستُفقد التغييرات عند إغلاق الصفحة.'); updateStorageNote(); }
+}
+
+/* ========== مطابقة الأسماء ========== */
+function findStudent(input){
+  var ni=norm(input); if(!ni) return null;
+  var tokens=ni.split(' ');
+  var list=S.students.map(function(s){return {s:s,t:norm(s.name).split(' ')};}).filter(function(x){return x.t[0];});
+  var i, exact=list.filter(function(x){return x.t.join(' ')===ni;})[0];
+  if(exact) return exact.s;
+  // كتبت اسمًا أطول من المسجّل (الاسم الأول فقط في القائمة)
+  var longer=list.filter(function(x){return x.t.every(function(t,i){return tokens[i]===t;});})
+    .sort(function(a,b){return b.t.length-a.t.length;})[0];
+  if(longer) return longer.s;
+  // كتبت الاسم الأول والمسجّل اسم كامل
+  var shorter=list.filter(function(x){return tokens.every(function(t,i){return x.t[i]===t;});})[0];
+  return shorter?shorter.s:null;
+}
+function messageFor(st){
+  if(st.msg && st.msg.trim()) return st.msg.trim();
+  return fill(LIB[hash(norm(st.name))%LIB.length].x, firstName(st.name));
+}
+
+/* ========== بطاقة الرسالة ========== */
+function letterHTML(name,text,cls){
+  var paras=String(text).split(/\n+/).filter(function(p){return p.trim();}).map(function(p){return '<p>'+esc(p)+'</p>';}).join('');
+  var teacher=S.settings.teacher||'';
+  return '<article class="letter '+(cls||'')+'"><div class="l-orn" aria-hidden="true">✦ ❀ ✦</div>'+
+    '<div class="l-name">'+esc(firstName(name))+'</div>'+
+    '<h2 class="l-title">رسالة من القلب إليكِ 💗</h2>'+
+    '<div class="l-body">'+paras+'</div>'+
+    '<p class="l-close">أنا فخورة بكِ، وأؤمن أن القادم أجمل</p>'+
+    (teacher?'<p class="l-sign">معلمتكِ الأستاذة: '+esc(teacher)+' 🌸</p>':'')+
+    '</article>';
+}
+
+/* ========== واجهة الطالبة ========== */
+var views=['viewStart','viewEnv','viewCard','viewTeacher'];
+function show(id){
+  views.forEach(function(v){$('#'+v).hidden=(v!==id);});
+  $('#main').classList.toggle('wide',id==='viewTeacher');
+  window.scrollTo(0,0);
+}
+var current=null, busy=false, usedLib=[];
+function nextLib(){
+  var pool=[];for(var i=0;i<LIB.length;i++){if(usedLib.indexOf(i)<0)pool.push(i);}
+  if(!pool.length){usedLib=usedLib.slice(-1);for(var j=0;j<LIB.length;j++){if(usedLib.indexOf(j)<0)pool.push(j);}}
+  var k=pool[Math.floor(Math.random()*pool.length)];usedLib.push(k);return k;
+}
+function gentle(msg){
+  var f=$('#nameInput');$('#hint').textContent=msg;
+  f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');f.focus();
+}
+function search(e){
+  e.preventDefault();
+  if(busy) return;
+  var raw=$('#nameInput').value;
+  if(!norm(raw)){ gentle('اكتبي اسمكِ أولًا يا غالية، ثم ابحثي عن رسالتكِ 💗'); return; }
+  $('#hint').textContent='';
+  var st=findStudent(raw);
+  if(st){ current={name:st.name,text:messageFor(st)}; }
+  else{
+    var i=nextLib(); var nm=raw.trim().replace(/\s+/g,' ');
+    current={name:nm,text:fill(LIB[i].x,firstName(nm))};
+  }
+  busy=true;
+  playEnvelope(function(){
+    $('#cardHost').innerHTML=letterHTML(current.name,current.text,'pop');
+    show('viewCard'); busy=false;
+    var r=$('#cardHost').getBoundingClientRect();
+    burst(r.left+r.width/2, Math.max(120,r.top+60), 16);
+  });
+}
+function playEnvelope(done){
+  var env=$('#env'); env.className='env'; show('viewEnv');
+  if(reduced){ setTimeout(done,300); return; }
+  void env.offsetWidth;
+  env.classList.add('shake');
+  setTimeout(function(){env.classList.remove('shake');env.classList.add('open');},650);
+  setTimeout(function(){env.classList.add('rise');},1350);
+  setTimeout(done,2450);
+}
+function burst(x,y,n){
+  if(reduced) return;
+  var sym=['💗','✨','⭐','💜','🌸','💌'];
+  for(var i=0;i<n;i++){
+    var s=document.createElement('span'); s.className='burst'; s.textContent=sym[i%sym.length];
+    var a=Math.random()*Math.PI*2, d=90+Math.random()*150;
+    s.style.left=x+'px'; s.style.top=y+'px';
+    s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',(Math.sin(a)*d-60)+'px'); s.style.setProperty('--r',(Math.random()*60-30)+'deg');
+    document.body.appendChild(s); (function(el){setTimeout(function(){el.remove();},1500);})(s);
+  }
+}
+function another(){
+  if(!current) return;
+  var i=nextLib(); current.text=fill(LIB[i].x,firstName(current.name));
+  $('#cardHost').innerHTML=letterHTML(current.name,current.text,'swap');
+  var r=$('#cardHost').getBoundingClientRect(); burst(r.left+r.width/2,Math.max(120,r.top+60),8);
+}
+function toStart(){
+  current=null; $('#nameInput').value=''; $('#hint').textContent=''; show('viewStart'); $('#nameInput').focus();
+}
+
+/* ========== الطباعة ========== */
+function printCards(items,mode){
+  if(!items.length){toast('لا توجد بطاقات للطباعة.');return;}
+  var pa=$('#printArea'); pa.className=mode;
+  pa.innerHTML=items.map(function(c){return letterHTML(c.name,c.text);}).join('');
+  setTimeout(function(){window.print();},150);
+}
+window.addEventListener('afterprint',function(){var pa=$('#printArea');pa.innerHTML='';pa.className='';});
+
+/* ========== مؤثرات الخلفية ========== */
+(function(){
+  var sym=['💗','✨','⭐','💌','🤍','💜','🌸','✦'], bg=$('#bg');
+  for(var i=0;i<22;i++){
+    var s=document.createElement('span'); s.className='float'; s.textContent=sym[i%sym.length];
+    s.style.left=(Math.random()*96)+'%'; s.style.fontSize=(14+Math.random()*22)+'px';
+    s.style.animationDuration=(16+Math.random()*18)+'s'; s.style.animationDelay=(-Math.random()*30)+'s';
+    bg.appendChild(s);
+  }
+})();
+
+/* ========== تنبيه صغير ========== */
+var toastT;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},3200);}
+function updateStorageNote(){
+  $('#storageNote').textContent = storageOK
+    ? 'الحفظ المحلي يعمل في هذا المتصفح. تبقى التغييرات هنا فقط ولا تظهر على أجهزة الطالبات.'
+    : 'تنبيه: الحفظ المحلي غير متاح في هذا المتصفح، لذلك ستُفقد التغييرات عند إغلاق الصفحة. صدّري نسخة احتياطية قبل الخروج.';
+}
+
+/* ========== الدخول إلى لوحة المعلمة ========== */
+function openGate(){ $('#gate').hidden=false; $('#gateInput').value=''; $('#gateHint').textContent=''; setTimeout(function(){$('#gateInput').focus();},30); }
+function closeGate(){ $('#gate').hidden=true; }
+function tryGate(e){
+  e.preventDefault();
+  if(digits($('#gateInput').value)===digits(S.settings.pass||'')){ closeGate(); openTeacher(); }
+  else{
+    $('#gateHint').textContent='الرمز غير صحيح، جرّبي مرة أخرى 🌷';
+    var f=$('#gateInput'); f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');
+  }
+}
+function openTeacher(){
+  show('viewTeacher'); updateStorageNote(); resetForm(); renderList();
+  $('#sTeacher').value=S.settings.teacher||''; $('#sPass').value='';
+}
+function exitTeacher(){ $('#list').innerHTML=''; resetForm(); toStart(); }
+
+/* ========== إدارة الطالبات ========== */
+var editingId=null, armedId=null, armedT;
+function resetForm(){
+  editingId=null; $('#tName').value=''; $('#tMsg').value=''; $('#formTitle').textContent='إضافة طالبة';
+  $('#btnCancelEdit').hidden=true; $('#btnSave').textContent='حفظ';
+}
+function fillThemes(){
+  $('#tTheme').innerHTML='<option value="">أي موضوع</option>'+THEMES.map(function(t){return '<option>'+esc(t)+'</option>';}).join('');
+}
+function renderList(){
+  var q=norm($('#filter').value||''), box=$('#list');
+  $('#count').textContent=S.students.length;
+  var rows=S.students.filter(function(s){return !q||norm(s.name).indexOf(q)>=0;});
+  if(!rows.length){ box.innerHTML='<div class="empty">'+(S.students.length?'لا توجد نتائج مطابقة.':'لم تُضَف أسماء بعد. أضيفي أول طالبة من النموذج.')+'</div>'; return; }
+  box.innerHTML=rows.map(function(s){
+    var snip=s.msg&&s.msg.trim()?s.msg.trim().slice(0,90)+(s.msg.length>90?'…':''):'(ستظهر لها رسالة من المكتبة)';
+    return '<div class="srow"><div><b>'+esc(s.name)+(s.example?' <span class="badge">مثال</span>':'')+'</b><small>'+esc(snip)+'</small></div>'+
+      '<div class="btns"><button class="btn sm soft" data-act="edit" data-id="'+s.id+'" type="button">تعديل</button>'+
+      '<button class="btn sm soft" data-act="view" data-id="'+s.id+'" type="button">معاينة</button>'+
+      '<button class="btn sm warn'+(armedId===s.id?' armed':'')+'" data-act="del" data-id="'+s.id+'" type="button">'+(armedId===s.id?'تأكيد الحذف؟':'حذف')+'</button></div></div>';
+  }).join('');
+}
+function byId(id){return S.students.filter(function(s){return s.id===id;})[0];}
+function saveStudent(){
+  var name=$('#tName').value.trim().replace(/\s+/g,' '), msg=$('#tMsg').value.trim();
+  if(!name){ toast('اكتبي اسم الطالبة أولًا 🌷'); $('#tName').focus(); return; }
+  var dup=S.students.filter(function(s){return norm(s.name)===norm(name)&&s.id!==editingId;})[0];
+  if(editingId){
+    var s=byId(editingId); if(s){ s.name=name; s.msg=msg; delete s.example; }
+    if(dup){ S.students=S.students.filter(function(x){return x.id!==dup.id;}); }
+    toast('تم حفظ التعديل ✨');
+  }else if(dup){
+    dup.msg=msg||dup.msg; delete dup.example; toast('الاسم موجود مسبقًا، فحدّثتُ رسالته.');
+  }else{
+    S.students.push({id:uid(),name:name,msg:msg}); toast('تمت إضافة '+name+' 💗');
+  }
+  save(); resetForm(); renderList();
+}
+function listClick(e){
+  var b=e.target.closest('button[data-act]'); if(!b) return;
+  var id=b.dataset.id, st=byId(id); if(!st) return;
+  if(b.dataset.act==='edit'){
+    editingId=id; $('#tName').value=st.name; $('#tMsg').value=st.msg||''; $('#formTitle').textContent='تعديل: '+st.name;
+    $('#btnCancelEdit').hidden=false; $('#btnSave').textContent='حفظ التعديل'; $('#tName').focus(); $('#tName').scrollIntoView({behavior:'smooth',block:'center'});
+  }else if(b.dataset.act==='view'){
+    openPreview(st.name,messageFor(st));
+  }else if(b.dataset.act==='del'){
+    if(armedId===id){ S.students=S.students.filter(function(s){return s.id!==id;}); armedId=null; if(editingId===id)resetForm(); save(); toast('تم الحذف.'); }
+    else{ armedId=id; clearTimeout(armedT); armedT=setTimeout(function(){armedId=null;renderList();},3000); }
+    renderList();
+  }
+}
+function genMessage(){
+  var theme=$('#tTheme').value, name=firstName($('#tName').value)||'غاليتي';
+  var pool=LIB.filter(function(m){return !theme||m.t===theme;});
+  var cur=$('#tMsg').value.trim(), pick;
+  for(var k=0;k<8;k++){ pick=pool[Math.floor(Math.random()*pool.length)]; if(fill(pick.x,name)!==cur) break; }
+  $('#tMsg').value=fill(pick.x,name);
+}
+function previewForm(){
+  var name=$('#tName').value.trim()||'اسم الطالبة', msg=$('#tMsg').value.trim();
+  if(!msg){ msg=fill(LIB[hash(norm(name))%LIB.length].x,firstName(name)); }
+  openPreview(name,msg);
+}
+function openPreview(name,text){ $('#previewHost').innerHTML=letterHTML(name,text,'swap'); $('#preview').hidden=false; }
+
+/* ========== الاستيراد والتصدير ========== */
+function addRows(rows){
+  var added=0, updated=0;
+  rows.forEach(function(r){
+    var name=(r[0]||'').trim().replace(/\s+/g,' '), msg=(r[1]||'').trim(); if(!name) return;
+    var ex=S.students.filter(function(s){return norm(s.name)===norm(name);})[0];
+    if(ex){ if(msg){ex.msg=msg;updated++;} delete ex.example; }
+    else{ S.students.push({id:uid(),name:name,msg:msg}); added++; }
+  });
+  save(); renderList();
+  toast('أُضيفت '+added+' طالبة'+(updated?' وحُدّثت رسائل '+updated:'')+'.');
+}
+function parseTable(text){
+  text=text.replace(/^﻿/,'').replace(/\r\n?/g,'\n');
+  var first=text.split('\n')[0]||'', d=',', best=0;
+  [',',';','\t','|'].forEach(function(x){var c=first.split(x).length-1; if(c>best){best=c;d=x;}});
+  var rows=[],row=[],cell='',q=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"'&&cell===''){ q=true; }
+    else if(ch===d){ row.push(cell);cell=''; }
+    else if(ch==='\n'){ row.push(cell);rows.push(row);row=[];cell=''; }
+    else cell+=ch;
+  }
+  row.push(cell); rows.push(row);
+  rows=rows.map(function(r){return r.map(function(c){return c.trim();});}).filter(function(r){return r.some(function(c){return c;});});
+  if(rows.length && /^(الاسم|اسم الطالبه|اسم الطالبة|اسم|name|names)$/i.test(rows[0][0])) rows.shift();
+  return rows;
+}
+function pasteNames(){
+  var t=$('#pasteBox').value; if(!t.trim()){ toast('الصقي الأسماء أولًا 🌷'); return; }
+  var rows=[];
+  t.split(/\n/).forEach(function(line){
+    if(!line.trim()) return;
+    if(line.indexOf('|')>=0||line.indexOf('\t')>=0){ var p=line.split(/\||\t/); rows.push([p[0],p.slice(1).join(' ')]); }
+    else line.split(/[،,؛;]/).forEach(function(n){ if(n.trim()) rows.push([n,'']); });
+  });
+  addRows(rows); $('#pasteBox').value='';
+}
+function readFile(file,cb){ var fr=new FileReader(); fr.onload=function(){cb(String(fr.result));}; fr.onerror=function(){toast('تعذّرت قراءة الملف.');}; fr.readAsText(file,'utf-8'); }
+function download(name,mime,content){
+  try{
+    var url=URL.createObjectURL(new Blob([content],{type:mime}));
+    var a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  }catch(e){ toast('تعذّر تنزيل الملف في هذا المتصفح.'); }
+}
+function exportCsv(){
+  var q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"';};
+  var lines=['الاسم,الرسالة'].concat(S.students.map(function(s){return q(s.name)+','+q(s.msg);}));
+  download('رسائل-الطالبات.csv','text/csv;charset=utf-8','﻿'+lines.join('\r\n'));
+}
+function backup(){
+  download('نسخة-احتياطية-رسائل.json','application/json',JSON.stringify({version:1,teacher:S.settings.teacher,students:S.students.map(function(s){return {name:s.name,msg:s.msg||''};})},null,2));
+}
+function restore(text){
+  try{
+    var d=JSON.parse(text); if(!d||!Array.isArray(d.students)) throw 0;
+    if(d.teacher) S.settings.teacher=d.teacher;
+    addRows(d.students.map(function(s){return [s.name,s.msg];}));
+  }catch(e){ toast('الملف ليس نسخة احتياطية صالحة.'); }
+}
+function fillEmpty(){
+  var empties=S.students.filter(function(s){return !(s.msg&&s.msg.trim());});
+  if(!empties.length){ toast('كل الطالبات لديهن رسائل بالفعل.'); return; }
+  var order=shuffle(LIB.map(function(_,i){return i;})), n=0;
+  empties.forEach(function(s,i){ s.msg=fill(LIB[order[i%order.length]].x,firstName(s.name)); n++; });
+  save(); renderList(); toast('أُنشئت '+n+' رسالة عشوائية. راجعيها وعدّليها كما تريدين.');
+}
+function shareCopy(){
+  var seed={studentCopy:true,settings:{teacher:S.settings.teacher||''},students:S.students.map(function(s){return {id:s.id,name:s.name,msg:s.msg||''};})};
+  var json=JSON.stringify(seed).replace(/</g,'\\u003c');
+  var html=SRC.replace(/(<script id="seed" type="application\/json">)([\s\S]*?)(<\/script>)/,function(m,a,b,c){return a+json+c;});
+  download('هناك-رسالة-تنتظرك.html','text/html;charset=utf-8',html);
+  toast('تم تنزيل نسخة الطالبات.');
+}
+function saveSettings(){
+  var t=$('#sTeacher').value.trim(), p=digits($('#sPass').value);
+  if(!t){ toast('اكتبي اسم المعلمة للتوقيع 🌷'); return; }
+  if(p && p.length<4){ toast('الرمز يحتاج 4 خانات على الأقل.'); return; }
+  S.settings.teacher=t; if(p) S.settings.pass=p;
+  save(); $('#sPass').value=''; toast(p?'تم حفظ الإعدادات والرمز الجديد.':'تم حفظ الإعدادات.');
+}
+
+/* ========== ربط الأحداث ========== */
+fillThemes();
+$('#searchForm').addEventListener('submit',search);
+$('#nameInput').addEventListener('input',function(){ $('#hint').textContent=''; });
+$('#btnAnother').addEventListener('click',another);
+$('#btnPrint').addEventListener('click',function(){ if(current) printCards([{name:current.name,text:current.text}],'one'); });
+$('#btnBack').addEventListener('click',toStart);
+
+if(studentCopy){ $('#btnTeacher').parentNode.hidden=true; }
+$('#btnTeacher').addEventListener('click',openGate);
+$('#gateForm').addEventListener('submit',tryGate);
+$('#gateCancel').addEventListener('click',closeGate);
+$('#btnExit').addEventListener('click',exitTeacher);
+
+$('#btnSave').addEventListener('click',saveStudent);
+$('#btnGen').addEventListener('click',genMessage);
+$('#btnPrev').addEventListener('click',previewForm);
+$('#btnCancelEdit').addEventListener('click',resetForm);
+$('#tName').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); saveStudent(); } });
+$('#list').addEventListener('click',listClick);
+$('#filter').addEventListener('input',renderList);
+$('#previewClose').addEventListener('click',function(){ $('#preview').hidden=true; });
+$('#preview').addEventListener('click',function(e){ if(e.target.id==='preview') $('#preview').hidden=true; });
+$('#gate').addEventListener('click',function(e){ if(e.target.id==='gate') closeGate(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ $('#preview').hidden=true; closeGate(); } });
+
+$('#btnPaste').addEventListener('click',pasteNames);
+$('#csvFile').addEventListener('change',function(e){ var f=e.target.files[0]; if(f) readFile(f,function(t){ addRows(parseTable(t)); }); e.target.value=''; });
+$('#restoreFile').addEventListener('change',function(e){ var f=e.target.files[0]; if(f) readFile(f,restore); e.target.value=''; });
+$('#btnFill').addEventListener('click',fillEmpty);
+$('#btnCsv').addEventListener('click',exportCsv);
+$('#btnBackup').addEventListener('click',backup);
+$('#btnShare').addEventListener('click',shareCopy);
+$('#btnPrintAll').addEventListener('click',function(){ printCards(S.students.map(function(s){return {name:s.name,text:messageFor(s)};}),'all'); });
+$('#btnSettings').addEventListener('click',saveSettings);
+
+})();
+</script>
+</body>
+</html>
